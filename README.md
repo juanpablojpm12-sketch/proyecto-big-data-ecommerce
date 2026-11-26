@@ -5,7 +5,7 @@
 | **Módulo** | Big Data |
 | **Programa** | Especialización en Ciencia de Datos — UNAULA |
 | **Docente** | Yeis Livis Taborda Henao |
-| **Estudiante** | Juan Pablo Martinez Benjumea |
+| **Estudiante** | Juan Pablo Martinez Benjumea,K.T Paulina Mena Cartagena |
 | **Plataforma** | Databricks Free Edition (Lakehouse, Delta Lake, Unity Catalog, Lakeflow Jobs, MLflow, AI/BI) |
 | **Datos** | Kaggle · [eCommerce Events History in Cosmetics Shop](https://www.kaggle.com/datasets/mkechinov/ecommerce-events-history-in-cosmetics-shop) |
 
