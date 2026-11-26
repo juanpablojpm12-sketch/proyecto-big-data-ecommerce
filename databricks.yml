@@ -7,7 +7,7 @@ bundle:
   name: proyecto_big_data_ecommerce
 
 include:
-  - resources/*.yml
+  - job_pipeline.yml
 
 targets:
   dev:

@@ -21,8 +21,10 @@ matplotlib.use("Agg")
 import pytest
 from pyspark.sql import SparkSession
 
-RAIZ = Path(__file__).resolve().parents[1]
-NOTEBOOKS = RAIZ / "notebooks"
+# Funciona con los notebooks en la carpeta "notebooks/" o en la raíz del repositorio
+_AQUI = Path(__file__).resolve().parent
+NOTEBOOKS = next(c for c in [_AQUI, _AQUI / "notebooks", _AQUI.parent / "notebooks", _AQUI.parent]
+                 if (c / "03_silver_limpieza.py").exists())
 BD = "ecommerce_test"
 
 

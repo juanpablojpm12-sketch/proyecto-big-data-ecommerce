@@ -5,11 +5,11 @@
 | **Módulo** | Big Data |
 | **Programa** | Especialización en Ciencia de Datos — UNAULA |
 | **Docente** | Yeis Livis Taborda Henao |
-| **Estudiante** | Juan Pablo Martinez Benjumea |
+| **Estudiante** | Juan Pablo Martinez Benjumea,K.T Paulina Mena Cartagena |
 | **Plataforma** | Databricks Free Edition (Lakehouse, Delta Lake, Unity Catalog, Lakeflow Jobs, MLflow, AI/BI) |
 | **Datos** | Kaggle · [eCommerce Events History in Cosmetics Shop](https://www.kaggle.com/datasets/mkechinov/ecommerce-events-history-in-cosmetics-shop) |
 
-> **Para ejecutar el proyecto paso a paso, ver [`docs/GUIA_PASO_A_PASO.md`](docs/GUIA_PASO_A_PASO.md).**
+> **Para ejecutar el proyecto paso a paso, ver [`GUIA_PASO_A_PASO.md`](GUIA_PASO_A_PASO.md).**
 
 ---
 
@@ -79,7 +79,7 @@ Relación B/C (12 meses)  = Utilidad extra 12 meses ÷ Costo total 12 meses
 ROI                      = (Beneficio − Costo) ÷ Costo
 ```
 
-### Supuestos de costo (editables en `notebooks/06_beneficio_costo.py`)
+### Supuestos de costo (editables en `06_beneficio_costo.py`)
 
 | Concepto | Valor | Tipo |
 |---|---|---|
@@ -108,7 +108,7 @@ reutilizable para nuevos modelos (recomendación de productos, pronóstico de de
 
 ## 3. Arquitectura propuesta
 
-![Arquitectura](docs/arquitectura.png)
+![Arquitectura](arquitectura.png)
 
 ### Explicación técnica
 
@@ -140,10 +140,10 @@ bronze_ingesta ──► silver_limpieza ──► gold_agregados ──┬─�
                                                        └──► beneficio_costo
 ```
 
-El Job está definido como código en [`resources/job_pipeline.yml`](resources/job_pipeline.yml)
+El Job está definido como código en [`job_pipeline.yml`](job_pipeline.yml)
 (Databricks Asset Bundle) y también puede crearse desde la interfaz (ver guía).
 
-### 🥉 Bronze — `notebooks/02_bronze_ingesta.py`
+### 🥉 Bronze — `02_bronze_ingesta.py`
 - **Auto Loader** con `trigger(availableNow=True)`: procesa todos los archivos pendientes y se detiene.
 - **Incremental**: el checkpoint recuerda los archivos ya cargados; si llega `2020-Mar.csv`, solo se carga ese.
 - Todas las columnas se guardan como **texto** para no perder datos por errores de tipo.
@@ -152,7 +152,7 @@ El Job está definido como código en [`resources/job_pipeline.yml`](resources/j
 
 **Tabla:** `bronze_eventos`
 
-### 🥈 Silver — `notebooks/03_silver_limpieza.py`
+### 🥈 Silver — `03_silver_limpieza.py`
 
 | Regla | Acción |
 |---|---|
@@ -169,7 +169,7 @@ El Job está definido como código en [`resources/job_pipeline.yml`](resources/j
 
 **Tablas:** `silver_eventos`, `silver_eventos_rechazados` (con motivo), `log_calidad_datos` (una fila por ejecución).
 
-### 🥇 Gold — `notebooks/04_gold_agregados.py`
+### 🥇 Gold — `04_gold_agregados.py`
 
 | Tabla | Para qué sirve |
 |---|---|
@@ -202,7 +202,7 @@ silver_eventos ───────────────► silver_eventos_r
 
 ## 5. Modelos de ciencia de datos
 
-Notebook: `notebooks/05_modelo_ciencia_datos.py`
+Notebook: `05_modelo_ciencia_datos.py`
 
 1. **Estadística descriptiva:** distribución de eventos por tipo; media, mediana, desviación estándar, cuartiles y
    asimetría del precio de compra; histograma de precios, serie de ingresos diarios y embudo.
@@ -227,7 +227,7 @@ producción se calcularían solo con los eventos anteriores al pago para predeci
 
 ## 6. Visualización
 
-Dashboard en **Databricks AI/BI** construido con las consultas de [`dashboard/consultas_dashboard.sql`](dashboard/consultas_dashboard.sql):
+Dashboard en **Databricks AI/BI** construido con las consultas de [`consultas_dashboard.sql`](consultas_dashboard.sql):
 
 | Visual | Fuente |
 |---|---|
@@ -241,7 +241,7 @@ Dashboard en **Databricks AI/BI** construido con las consultas de [`dashboard/co
 | Sesiones por grupo de riesgo (modelo) | `gold_probabilidad_compra` |
 | Tabla de calidad de datos | `log_calidad_datos` |
 
-*(Agregar aquí capturas del dashboard: `docs/dashboard.png`)*
+*(Agregar aquí capturas del dashboard: `dashboard.png`)*
 
 ---
 
@@ -251,10 +251,10 @@ Dashboard en **Databricks AI/BI** construido con las consultas de [`dashboard/co
   que se ejecuta es el mismo del repositorio.
 - **CI (GitHub Actions):** [`.github/workflows/ci.yml`](.github/workflows/ci.yml) se ejecuta en cada *push*:
   1. revisa la sintaxis de todos los notebooks;
-  2. ejecuta [`tests/test_pipeline_local.py`](tests/test_pipeline_local.py), que corre las capas Silver y Gold, el
+  2. ejecuta [`test_pipeline_local.py`](test_pipeline_local.py), que corre las capas Silver y Gold, el
      modelo y el beneficio/costo con **PySpark local** sobre datos sintéticos con el mismo esquema (incluye
      fechas inválidas, precios negativos y duplicados) y verifica las reglas de calidad.
-- **CD (opcional):** el Job está declarado en `databricks.yml` + `resources/job_pipeline.yml` y se despliega con
+- **CD (opcional):** el Job está declarado en `databricks.yml` + `job_pipeline.yml` y se despliega con
   `databricks bundle deploy`.
 
 ---
@@ -262,25 +262,23 @@ Dashboard en **Databricks AI/BI** construido con las consultas de [`dashboard/co
 ## 8. Estructura del repositorio
 
 ```
-├── README.md                         ← este documento
-├── databricks.yml                    ← Databricks Asset Bundle
-├── resources/job_pipeline.yml        ← definición del Job (orquestación)
-├── notebooks/
-│   ├── 00_config.py                  ← nombres de catálogo, esquema, volúmenes y tablas
-│   ├── 01_setup.py                   ← crea esquema y volúmenes (una sola vez)
-│   ├── 02_bronze_ingesta.py          ← BRONZE: Auto Loader incremental
-│   ├── 03_silver_limpieza.py         ← SILVER: calidad, cuarentena, duplicados, log
-│   ├── 04_gold_agregados.py          ← GOLD: tablas de negocio
-│   ├── 05_modelo_ciencia_datos.py    ← descriptiva, Chi-cuadrado, regresión logística + MLflow
-│   ├── 06_beneficio_costo.py         ← ROI con datos reales
-│   └── 99_ejecutar_todo.py           ← alternativa manual al Job
-├── dashboard/consultas_dashboard.sql ← consultas del dashboard
-├── docs/
-│   ├── arquitectura.png / .dot       ← diagrama de arquitectura
-│   └── GUIA_PASO_A_PASO.md           ← cómo ejecutar todo
-├── tests/test_pipeline_local.py      ← pruebas automáticas (CI)
-├── .github/workflows/ci.yml          ← GitHub Actions
-└── requirements-dev.txt
+├── README.md                     ← este documento
+├── GUIA_PASO_A_PASO.md           ← cómo ejecutar todo
+├── arquitectura.png / .dot       ← diagrama de arquitectura
+├── 00_config.py                  ← nombres de catálogo, esquema, volúmenes y tablas
+├── 01_setup.py                   ← crea esquema y volúmenes (una sola vez)
+├── 02_bronze_ingesta.py          ← BRONZE: Auto Loader incremental
+├── 03_silver_limpieza.py         ← SILVER: calidad, cuarentena, duplicados, log
+├── 04_gold_agregados.py          ← GOLD: tablas de negocio
+├── 05_modelo_ciencia_datos.py    ← descriptiva, Chi-cuadrado, regresión logística + MLflow
+├── 06_beneficio_costo.py         ← ROI con datos reales
+├── 99_ejecutar_todo.py           ← alternativa manual al Job
+├── consultas_dashboard.sql       ← consultas del dashboard
+├── databricks.yml                ← Databricks Asset Bundle
+├── job_pipeline.yml              ← definición del Job (orquestación)
+├── test_pipeline_local.py        ← pruebas automáticas (CI)
+├── requirements-dev.txt
+└── .github/workflows/ci.yml      ← GitHub Actions
 ```
 
 **Fuente de datos:** Kechinov, M. *eCommerce Events History in Cosmetics Shop*, Kaggle (datos del proyecto

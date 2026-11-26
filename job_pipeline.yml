@@ -12,20 +12,20 @@ resources:
       tasks:
         - task_key: bronze_ingesta
           notebook_task:
-            notebook_path: ../notebooks/02_bronze_ingesta.py
+            notebook_path: ./02_bronze_ingesta.py
         - task_key: silver_limpieza
           depends_on: [{task_key: bronze_ingesta}]
           notebook_task:
-            notebook_path: ../notebooks/03_silver_limpieza.py
+            notebook_path: ./03_silver_limpieza.py
         - task_key: gold_agregados
           depends_on: [{task_key: silver_limpieza}]
           notebook_task:
-            notebook_path: ../notebooks/04_gold_agregados.py
+            notebook_path: ./04_gold_agregados.py
         - task_key: modelo_ciencia_datos
           depends_on: [{task_key: gold_agregados}]
           notebook_task:
-            notebook_path: ../notebooks/05_modelo_ciencia_datos.py
+            notebook_path: ./05_modelo_ciencia_datos.py
         - task_key: beneficio_costo
           depends_on: [{task_key: gold_agregados}]
           notebook_task:
-            notebook_path: ../notebooks/06_beneficio_costo.py
+            notebook_path: ./06_beneficio_costo.py
