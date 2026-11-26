@@ -1,0 +1,15 @@
+# Datos: los CSV de Kaggle NO se suben a GitHub (pesan ~2 GB)
+*.csv
+*.zip
+data/
+
+# Python / Spark / MLflow locales
+__pycache__/
+.pytest_cache/
+spark-warehouse/
+metastore_db/
+mlruns/
+derby.log
+
+# Databricks bundle
+.databricks/
