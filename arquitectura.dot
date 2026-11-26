@@ -1,0 +1,47 @@
+digraph arquitectura {
+  rankdir=LR;
+  graph [fontname="Helvetica", fontsize=20, bgcolor="white", pad=0.4, nodesep=0.35, ranksep=0.55,
+         label="Arquitectura propuesta · E-commerce de cosméticos en Databricks (Lakehouse + Medallion)\n ", labelloc=t];
+  node  [fontname="Helvetica", fontsize=12, shape=box, style="rounded,filled", color="#3d4a5c", penwidth=1.3];
+  edge  [fontname="Helvetica", fontsize=10, color="#3d4a5c", penwidth=1.4];
+
+  subgraph cluster_fuente {
+    label="1. Fuente"; style="rounded,dashed"; color="#8a94a6"; fontsize=14;
+    kaggle [label="Kaggle\neCommerce Events History\nin Cosmetics Shop\n\n5 CSV mensuales\n(oct-2019 a feb-2020)\n~20 M eventos · ~2 GB", fillcolor="#eef2f7"];
+  }
+
+  subgraph cluster_dbx {
+    label="2. Databricks Free Edition · Unity Catalog  (workspace.ecommerce)"; style="rounded"; color="#ff3621"; fontsize=14;
+
+    vol [label="Volume  raw\n(zona de aterrizaje)\n/Volumes/workspace/\necommerce/raw", fillcolor="#f4f4f4"];
+
+    subgraph cluster_job {
+      label="Job orquestado: pipeline_ecommerce_medallion (Lakeflow Jobs, serverless)"; style="rounded,filled"; fillcolor="#fbfbfb"; color="#9aa5b1"; fontsize=12;
+      bronze [label="BRONZE\nbronze_eventos\n\nAuto Loader incremental\ntodo como texto\n+ archivo origen y fecha carga", fillcolor="#e3b58b"];
+      silver [label="SILVER\nsilver_eventos\n\ntipado seguro · reglas de calidad\nduplicados · enriquecimiento\n+ silver_eventos_rechazados\n+ log_calidad_datos", fillcolor="#c9ced6"];
+      gold   [label="GOLD\nkpis · ventas diarias · embudo\ncarritos abandonados · marcas\ncategorías · actividad por hora\nsesiones · clientes RFM", fillcolor="#f2d16b"];
+      ml     [label="CIENCIA DE DATOS\nestadística descriptiva\nChi-cuadrado · correlaciones\nregresión logística (ROC/AUC)\n→ gold_probabilidad_compra", fillcolor="#b7d7e8"];
+      bc     [label="BENEFICIO / COSTO\ngold_beneficio_costo\n(ROI por escenario)", fillcolor="#cfe8c9"];
+    }
+    mlflow [label="MLflow\nparámetros · métricas\ncurva ROC · modelo", fillcolor="#e8eaf6"];
+    dash   [label="AI/BI Dashboard\n+ SQL Warehouse", fillcolor="#e8eaf6"];
+  }
+
+  subgraph cluster_ci {
+    label="3. CI/CD"; style="rounded,dashed"; color="#8a94a6"; fontsize=14;
+    gh [label="GitHub\nrepositorio + Git folder\nGitHub Actions:\npruebas PySpark", fillcolor="#eef2f7"];
+  }
+
+  usuarios [label="Usuarios de negocio\nGerencia · Marketing", shape=ellipse, fillcolor="#ffffff"];
+
+  kaggle -> vol    [label=" carga\n CSV"];
+  vol    -> bronze [label=" cloudFiles"];
+  bronze -> silver -> gold;
+  gold   -> ml;
+  gold   -> bc;
+  ml     -> mlflow [style=dashed];
+  gold   -> dash;
+  ml     -> dash   [style=dashed];
+  dash   -> usuarios;
+  gh     -> bronze [style=dotted, label=" código de\n notebooks", constraint=false];
+}

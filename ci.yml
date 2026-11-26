@@ -1,0 +1,37 @@
+# Integración continua: en cada push o pull request se prueba el pipeline con PySpark local.
+name: CI - pruebas del pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Java 17 (lo necesita Spark)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Instalar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements-dev.txt
+
+      - name: Revisar sintaxis de los notebooks
+        run: python -m py_compile notebooks/*.py tests/*.py
+
+      - name: Ejecutar pruebas (Silver, Gold, Modelo, Beneficio/Costo)
+        env:
+          MLFLOW_ALLOW_FILE_STORE: "true"
+        run: pytest -q -W ignore

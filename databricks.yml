@@ -1,0 +1,15 @@
+# Databricks Asset Bundle: define el Job del pipeline como código (Infraestructura como Código).
+# Uso opcional con la CLI de Databricks:
+#   databricks bundle validate
+#   databricks bundle deploy
+#   databricks bundle run pipeline_ecommerce_medallion
+bundle:
+  name: proyecto_big_data_ecommerce
+
+include:
+  - resources/*.yml
+
+targets:
+  dev:
+    mode: development
+    default: true
