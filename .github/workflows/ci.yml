@@ -29,7 +29,7 @@ jobs:
         run: pip install -r requirements-dev.txt
 
       - name: Revisar sintaxis de los notebooks
-        run: python -m py_compile notebooks/*.py tests/*.py
+        run: python -m py_compile $(git ls-files '*.py')
 
       - name: Ejecutar pruebas (Silver, Gold, Modelo, Beneficio/Costo)
         env:
